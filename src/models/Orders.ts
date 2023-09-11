@@ -7,6 +7,7 @@ export interface IOrder extends Document {
     user_id: string
     foods: string
     number: number
+    commit:string
     status: boolean
     created_at: Date
 }
@@ -26,6 +27,9 @@ const OrderSchema = new Schema({
     },
     number:{
         type:Number
+    },
+    commit:{
+        type:String
     },
     status:{
         type: Boolean,
