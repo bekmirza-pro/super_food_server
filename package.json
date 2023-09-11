@@ -6,7 +6,8 @@
     "scripts": {
         "dev": "nodemon --config nodemon.json src/index.ts",
         "start": "ts-node ./src/index.ts",
-        "test": "jest --coverage"
+        "test": "jest --coverage",
+        "build":"npx tsc"
     },
     "keywords": [],
     "author": "Bekmirza Yoqubov",
