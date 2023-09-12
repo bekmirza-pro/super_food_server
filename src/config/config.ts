@@ -11,7 +11,7 @@ interface Config {
 }
 
 let config: Config = {
-    HttpPort: getConf('HTTP_PORT', '3000'),
+    HttpPort: getConf('HTTP_PORT', '8080'),
     MongoPort: parseInt(getConf('MONGO_PORT', '27017')),
     MongoDatabase: getConf('MONGO_DATABASE', 'super_food'),
     JwtSecret: getConf('JWT_SECRET', 'my_secret'),

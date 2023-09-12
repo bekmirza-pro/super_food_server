@@ -9,7 +9,7 @@ import { langMiddleware } from './middleware/lang'
 // Telegram bot
 const TelegramBot = require('node-telegram-bot-api')
 
-const botToken = process.env.TELEGRAM_BOT_TOKEN
+const botToken = '6573404022:AAEbqbHlhhQHPrx-1Vs2v_sZT1FxW_pOAU8'
 const bot = new TelegramBot(botToken, { polling: true })
 import Food from './models/Food'
 import Orders from './models/Orders'
