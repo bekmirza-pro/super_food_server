@@ -157,10 +157,10 @@ bot.on('callback_query', async (query: any) => {
             }
         })
 
-        bot.onText(/Sonini belgilash:/, async (msgg: any) => {
+        bot.onText(/Sonini belgilash:/, async (msg: any) => {
             let number: any
 
-            bot.sendMessage(msgg.chat.id, 'Nechta buyurtirishni istaysiz:', {
+            bot.sendMessage(msg.chat.id, 'Nechta buyurtirishni istaysiz:', {
                 reply_markup: {
                     force_reply: true,
                     selective: true
@@ -169,8 +169,8 @@ bot.on('callback_query', async (query: any) => {
                 const replyListenerId = bot.onReplyToMessage(
                     payload.chat.id,
                     payload.message_id,
-                    (msgg: any) => {
-                        number = msgg.text
+                    (msg: any) => {
+                        number = msg.text
 
                         bot.removeReplyListener(replyListenerId)
 
