@@ -134,10 +134,11 @@ bot.on('callback_query', async (query: any) => {
 
     const foodData = await Food.findById({ _id: _id })
 
+    
     // console.log(`http://localhost:3000/api/api/file/${foodData[0].images[0]}`);
 
     if (foodData) {
-        bot.sendPhoto(chatId, `https://pro.zirapcha.uz/api/api/file/${foodData[0].images[0]}`, {
+        bot.sendPhoto(chatId, `https://pro.zirapcha.uz/api/api/file/${foodData?.images[0]}`, {
             caption: `Nomi: ${foodData.name}\nTa'rif: ${foodData.description}\nNarxi: ${foodData.price}`,
             reply_markup: {
                 keyboard: [
