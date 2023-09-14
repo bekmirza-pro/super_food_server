@@ -15,8 +15,12 @@ import Food from './models/Food'
 import Orders from './models/Orders'
 import User from './models/User'
 
+
+
 bot.onText(/\/start/, async (msg: any) => {
     const receiver = msg.chat.id
+
+
 
     bot.sendMessage(
         receiver,
@@ -46,6 +50,8 @@ bot.onText(/\/start/, async (msg: any) => {
 
 
 bot.on('message', async (msg: any) => {
+
+
     const receiver = msg.chat.id
 
     const foods = await Food.find({})
@@ -64,10 +70,15 @@ bot.on('message', async (msg: any) => {
 
 
     if (msg.text === '🥐 Shirinlik turlari') {
+
+
         bot.sendMessage(receiver, 'Shirinlik turlari', keyboard)
     }
 
     if (msg.text === '📞 Aloqa') {
+
+
+
         bot.sendMessage(receiver, 'Biz bilan bog`lanish uchun ushbu ishonch telefonlaridan foydalanishingiz mumkin:\n\nTell: +998(90) 475 11 22\n         +998(90) 465 11 22', {
             reply_markup: {
                 keyboard: [
@@ -83,6 +94,9 @@ bot.on('message', async (msg: any) => {
     }
 
     if (msg.text === '👥 Biz haqimizda') {
+
+
+
         bot.sendMessage(receiver, 'Biz bilan bog`lanish uchun ushbu ishonch telefonlaridan foydalanishingiz mumkin:\n\nTell: +998(90) 475 11 22\n        +998(90) 465 11 22', {
             reply_markup: {
                 keyboard: [
@@ -98,6 +112,9 @@ bot.on('message', async (msg: any) => {
     }
 
     if (msg.text === '⬅️ Orqaga ➡️') {
+
+
+
         bot.sendMessage(receiver, '✅ Asosiy menyuga qaytdingiz !!!', {
             reply_markup: {
                 keyboard: [
@@ -121,6 +138,9 @@ bot.on('message', async (msg: any) => {
     }
 
     if (msg.text === '⬅️ Shirinliklar ➡️') {
+
+
+
         bot.sendMessage(receiver, '✅Shirinliklar menusiga qaytdingiz !!!', 
             keyboard
         )
@@ -134,11 +154,11 @@ bot.on('callback_query', async (query: any) => {
 
     const foodData = await Food.findById({ _id: _id })
 
-    
     // console.log(`http://localhost:3000/api/api/file/${foodData[0].images[0]}`);
+    // https://pro.zirapcha.uz/api/api/file/${foodData?.images[0]}
 
     if (foodData) {
-        bot.sendPhoto(chatId, `https://pro.zirapcha.uz/api/api/file/${foodData?.images[0]}`, {
+        bot.sendPhoto(chatId, `https://customtattoodesign.ca/api/wp-content/uploads/2020/03/fatty-foods.jpg`, {
             caption: `Nomi: ${foodData.name}\nTa'rif: ${foodData.description}\nNarxi: ${foodData.price}`,
             reply_markup: {
                 keyboard: [
@@ -157,98 +177,127 @@ bot.on('callback_query', async (query: any) => {
             }
         })
 
+   
+        let replyListenerId:any = null
+
+        let messageSent = false;
+
         bot.onText(/Sonini belgilash:/, async (msg: any) => {
             let number: any
 
-            bot.sendMessage(msg.chat.id, 'Nechta buyurtirishni istaysiz:', {
-                reply_markup: {
-                    force_reply: true,
-                    selective: true
+
+            
+                if (replyListenerId !== null) {
+                    bot.removeReplyListener(replyListenerId);
+                    replyListenerId = null; // Reset the listener ID variable
                 }
-            }).then((payload: any) => {
-                const replyListenerId = bot.onReplyToMessage(
-                    payload.chat.id,
-                    payload.message_id,
-                    (msg: any) => {
-                        number = msg.text
 
-                        bot.removeReplyListener(replyListenerId)
+                if (!messageSent) {
 
-                        bot.sendMessage(chatId, 'Raqamingizni yuboring:', {
-                            reply_markup: {
-                                keyboard: [
-                                    [
-                                        {
-                                            text: 'Contact',
-                                            request_contact: true
-                                        }
+                bot.sendMessage(msg.chat.id, 'Nechta buyurtirishni istaysiz:', {
+                    reply_markup: {
+                        force_reply: true,
+                        selective: true
+                    }
+                    
+                }).then((payload: any) => {
+
+                    replyListenerId = bot.onReplyToMessage(
+                        payload.chat.id,
+                        payload.message_id,
+                        (msg: any) => {
+                            number = msg.text
+    
+                            bot.removeReplyListener(replyListenerId)
+                            replyListenerId = null
+
+                            bot.sendMessage(chatId, 'Raqamingizni yuboring:', {
+                                reply_markup: {
+                                    keyboard: [
+                                        [
+                                            {
+                                                text: 'Contact',
+                                                request_contact: true
+                                            }
+                                        ],
+                                        [
+                                            {
+                                                text: '⬅️ Orqaga ➡️'
+                                            }
+                                        ]
                                     ],
-                                    [
-                                        {
-                                            text: '⬅️ Orqaga ➡️'
-                                        }
-                                    ]
-                                ],
-                                resize_keyboard: true
-                            }
-                        }).then((payload: any) => {
-                            const replyListenerId = bot.onReplyToMessage(
-                                payload.chat.id,
-                                payload.message_id,
-                                async (msg: any) => {
-                                    bot.removeReplyListener(replyListenerId)
+                                    resize_keyboard: true
+                                }
 
-                                    let user = await User.find({
-                                        phone_number: msg.contact.phone_number
-                                    })
+                            }).then((payload: any) => {
+                                 replyListenerId = bot.onReplyToMessage(
+                                    payload.chat.id,
+                                    payload.message_id, 
+                                    async (msg: any) => {
 
-                                    if (user.length == 0) {
-                                        let userNew = await User.create({
-                                            name: `${msg.from.first_name} ${msg.from.last_name}`,
-                                            username: msg.from.username,
+                                        bot.removeReplyListener(replyListenerId)
+                                        replyListenerId = null
+
+                                        let user = await User.find({
                                             phone_number: msg.contact.phone_number
                                         })
-
-                                        let order = await Orders.create({
-                                            user_id: userNew._id,
-                                            food_id: foodData._id,
-                                            number: number
-                                        })
-                                    } else {
-                                        let order = await Orders.create({
-                                            user_id: user[0]._id,
-                                            food_id: foodData._id,
-                                            number: number
-                                        })
-                                    }
-
-                                    bot.sendMessage(
-                                        chatId,
-                                        'Sizning buyurtmangiz qabul qilindi, yaqin orada aloqaga chiqamiz 😊😊😊 !!',
-                                        {
-                                            reply_markup: {
-                                                keyboard: [
-                                                    [
-                                                        {
-                                                            text: '⬅️ Shirinliklar ➡️'
-                                                        }
-                                                    ],
-                                                    [
-                                                        {
-                                                            text: '⬅️ Orqaga ➡️'
-                                                        }
-                                                    ]
-                                                ],
-                                                resize_keyboard: true
-                                            }
+    
+                                        if (user.length == 0) {
+                                            let userNew = await User.create({
+                                                name: `${msg.from.first_name} ${msg.from.last_name}`,
+                                                username: msg.from.username,
+                                                phone_number: msg.contact.phone_number
+                                            })
+    
+                                            let order = await Orders.create({
+                                                user_id: userNew._id,
+                                                food_id: foodData._id,
+                                                number: number
+                                            })
+                                        } else {
+                                            let order = await Orders.create({
+                                                user_id: user[0]._id,
+                                                food_id: foodData._id,
+                                                number: number
+                                            })
                                         }
-                                    )
-                                }
-                            )
-                        })
-                    }
-                )
-            })
+    
+                                        bot.sendMessage(
+                                            chatId,
+                                            'Sizning buyurtmangiz qabul qilindi, yaqin orada aloqaga chiqamiz 😊😊😊 !!',
+                                            {
+                                                reply_markup: {
+                                                    keyboard: [
+                                                        [
+                                                            {
+                                                                text: '⬅️ Shirinliklar ➡️'
+                                                            }
+                                                        ],
+                                                        [
+                                                            {
+                                                                text: '⬅️ Orqaga ➡️'
+                                                            }
+                                                        ]
+                                                    ],
+                                                    resize_keyboard: true
+                                                }
+                                            }
+                                        )
+                                   
+                                        bot.removeReplyListener(replyListenerId)
+                                        replyListenerId = null
+                                    }
+                                )
+                            })
+
+                            bot.removeReplyListener(replyListenerId)
+                            replyListenerId = null
+                        }
+                    )
+                })
+
+                messageSent = true;
+            }
         })
     }
 })
