@@ -158,7 +158,7 @@ bot.on('callback_query', async (query: any) => {
     // https://pro.zirapcha.uz/api/api/file/${foodData?.images[0]}
 
     if (foodData) {
-        bot.sendPhoto(chatId, `https://customtattoodesign.ca/api/wp-content/uploads/2020/03/fatty-foods.jpg`, {
+        bot.sendPhoto(chatId, `https://pro.zirapcha.uz/api/api/file/${foodData?.images[0]}`, {
             caption: `Nomi: ${foodData.name}\nTa'rif: ${foodData.description}\nNarxi: ${foodData.price}`,
             reply_markup: {
                 keyboard: [
