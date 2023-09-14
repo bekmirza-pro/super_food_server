@@ -186,7 +186,6 @@ bot.on('callback_query', async (query: any) => {
             let number: any
 
 
-            
                 if (replyListenerId !== null) {
                     bot.removeReplyListener(replyListenerId);
                     replyListenerId = null; // Reset the listener ID variable
