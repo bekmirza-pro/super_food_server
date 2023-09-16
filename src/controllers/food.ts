@@ -97,7 +97,7 @@ export class FoodController {
         const food = await Food.findById(req.params.id)
 
         if (`${food?.images}` !== 'undefined') {
-            await unlink(path.join(__dirname, '../../uploads', `${food?.images}`))
+            await unlink(path.join(__dirname, '../../uploads/images', `${food?.images}`))
         }
 
         await storage.food.delete(req.params.id)
