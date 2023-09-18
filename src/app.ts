@@ -9,7 +9,7 @@ import { langMiddleware } from './middleware/lang'
 // Telegram bot
 const TelegramBot = require('node-telegram-bot-api')
 
-const botToken = '6573404022:AAEbqbHlhhQHPrx-1Vs2v_sZT1FxW_pOAU8'
+const botToken = '6678145484:AAGn5whjQkiRrKa6VeV8ZILqAtPuODKZQN4'
 const bot = new TelegramBot(botToken, { polling: true })
 import Food from './models/Food'
 import Orders from './models/Orders'
@@ -24,7 +24,7 @@ bot.onText(/\/start/, async (msg: any) => {
 
     bot.sendMessage(
         receiver,
-        `Assalomu aleykum ${msg.from.first_name}, Super Foodning rasmiy botiga xush kelibsiz !!`,
+        `Assalomu aleykum ${msg.from.first_name}, Nurqandning rasmiy botiga xush kelibsiz !!`,
         {
             reply_markup: {
                 keyboard: [
