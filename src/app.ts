@@ -57,7 +57,11 @@ bot.on('message', async (msg: any) => {
 
     const keyboard = {
         reply_markup: {
-            inline_keyboard: [foodButtons]
+            inline_keyboard: [
+                foodButtons.slice(0, Math.ceil(foodButtons.length / 2)),
+                foodButtons.slice(Math.ceil(foodButtons.length / 2))
+            ],
+            resize_keyboard: true
         }
     }
 
@@ -166,16 +170,16 @@ bot.on('callback_query', async (query: any) => {
         let messageSent = false
 
         bot.onText(/Sonini belgilash:/, async (msg: any) => {
-            let number: any;
-        
+            let number: any
+
             if (replyListenerId !== null) {
-                bot.removeReplyListener(replyListenerId);
-                replyListenerId = null; // Reset the listener ID variable
+                bot.removeReplyListener(replyListenerId)
+                replyListenerId = null // Reset the listener ID variable
             }
-        
+
             if (!messageSent) {
-                let isInvalidInput = false;
-        
+                let isInvalidInput = false
+
                 // Function to handle the "Enter Number" step
                 const handleEnterNumberStep = () => {
                     bot.sendMessage(msg.chat.id, 'Nechta buyurtirishni istaysiz:', {
@@ -188,71 +192,67 @@ bot.on('callback_query', async (query: any) => {
                             payload.chat.id,
                             payload.message_id,
                             (msg: any) => {
-                                number = msg.text;
-        
+                                number = msg.text
+
                                 if (!isNaN(number)) {
                                     // It's a valid number, move to the next step
-                                    isInvalidInput = false;
-                                    handleEnterPhoneNumberStep();
+                                    isInvalidInput = false
+                                    handleEnterPhoneNumberStep()
                                 } else {
                                     // Invalid input, not a number
-                                    isInvalidInput = true;
-                                    handleEnterNumberStep(); // Prompt again for a valid number
+                                    isInvalidInput = true
+                                    handleEnterNumberStep() // Prompt again for a valid number
                                 }
-        
-                                bot.removeReplyListener(replyListenerId);
-                                replyListenerId = null;
+
+                                bot.removeReplyListener(replyListenerId)
+                                replyListenerId = null
                             }
-                        );
-                    });
-                };
-        
+                        )
+                    })
+                }
+
                 // Function to handle the "Enter Phone Number" step
                 const handleEnterPhoneNumberStep = () => {
-                    bot.sendMessage(
-                        chatId,
-                        'Raqamingizni namunadagidek yuboring: 998339908007',
-                        {
-                            reply_markup: {
-                                force_reply: true,
-                                selective: true
-                            }
+                    bot.sendMessage(chatId, 'Raqamingizni namunadagidek yuboring: 998339908007', {
+                        reply_markup: {
+                            force_reply: true,
+                            selective: true
                         }
-                    ).then((payload: any) => {
+                    }).then((payload: any) => {
                         replyListenerId = bot.onReplyToMessage(
                             payload.chat.id,
                             payload.message_id,
                             async (msg: any) => {
-                                bot.removeReplyListener(replyListenerId);
-                                replyListenerId = null;
-        
+                                bot.removeReplyListener(replyListenerId)
+                                replyListenerId = null
+
                                 if (!isNaN(msg.text)) {
-                                    const phone_number = parseFloat(msg.text);
-        
+                                    const phone_number = parseFloat(msg.text)
+
                                     let user = await User.find({
                                         phone_number: phone_number
-                                    });
-        
+                                    })
+
                                     if (user.length == 0) {
                                         let userNew = await User.create({
                                             name: `${msg.from.first_name}`,
                                             username: msg.from.username,
                                             phone_number: phone_number
-                                        });
-        
+                                        })
+
                                         let order = await Orders.create({
                                             user_id: userNew._id,
                                             food_id: foodData._id,
                                             number: number
-                                        });
+                                        })
                                     } else {
                                         let order = await Orders.create({
                                             user_id: user[0]._id,
                                             food_id: foodData._id,
                                             number: number
-                                        });
+                                        })
                                     }
-        
+
                                     bot.sendMessage(
                                         chatId,
                                         'Sizning buyurtmangiz qabul qilindi, yaqin orada aloqaga chiqamiz 😊😊😊 !!',
@@ -273,25 +273,25 @@ bot.on('callback_query', async (query: any) => {
                                                 resize_keyboard: true
                                             }
                                         }
-                                    );
-        
-                                    bot.removeReplyListener(replyListenerId);
-                                    replyListenerId = null;
+                                    )
+
+                                    bot.removeReplyListener(replyListenerId)
+                                    replyListenerId = null
                                 } else {
                                     // Invalid input for the phone number, prompt again
-                                    handleEnterPhoneNumberStep();
+                                    handleEnterPhoneNumberStep()
                                 }
                             }
-                        );
-                    });
-                };
-        
+                        )
+                    })
+                }
+
                 // Start with the "Enter Number" step
-                handleEnterNumberStep();
-        
-                messageSent = true;
+                handleEnterNumberStep()
+
+                messageSent = true
             }
-        });
+        })
     }
 })
 
