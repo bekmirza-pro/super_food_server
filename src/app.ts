@@ -45,6 +45,8 @@ bot.onText(/\/start/, async (msg: any) => {
     )
 })
 
+let conversationState: any = {}
+
 bot.on('message', async (msg: any) => {
     const receiver = msg.chat.id
 
@@ -108,6 +110,15 @@ bot.on('message', async (msg: any) => {
     }
 
     if (msg.text === '⬅️ Orqaga ➡️') {
+        const userId = msg.from.id
+
+        if (conversationState[userId]) {
+            // If yes, delete the conversation state
+            delete conversationState[userId]
+        }
+
+        bot.removeAllListeners('text');
+
         bot.sendMessage(receiver, '✅ Asosiy menyuga qaytdingiz !!!', {
             reply_markup: {
                 keyboard: [
@@ -161,6 +172,7 @@ bot.on('callback_query', async (query: any) => {
                         }
                     ]
                 ],
+                resize_keyboard: true,
                 one_time_keyboard: true
             }
         })
@@ -169,65 +181,68 @@ bot.on('callback_query', async (query: any) => {
 
         let messageSent = false
 
+
+        const conversationState: { [userId: number]: any } = {}
+
         bot.onText(/Sonini belgilash:/, async (msg: any) => {
-            let number: any
+            const userId = msg.from.id
 
-            if (replyListenerId !== null) {
-                bot.removeReplyListener(replyListenerId)
-                replyListenerId = null // Reset the listener ID variable
-            }
-
-            if (!messageSent) {
-                let isInvalidInput = false
-
-                // Function to handle the "Enter Number" step
-                const handleEnterNumberStep = () => {
-                    bot.sendMessage(msg.chat.id, 'Nechta buyurtirishni istaysiz:', {
-                        reply_markup: {
-                            force_reply: true,
-                            selective: true
-                        }
-                    }).then((payload: any) => {
-                        replyListenerId = bot.onReplyToMessage(
-                            payload.chat.id,
-                            payload.message_id,
-                            (msg: any) => {
-                                number = msg.text
-
-                                if (!isNaN(number)) {
-                                    // It's a valid number, move to the next step
-                                    isInvalidInput = false
-                                    handleEnterPhoneNumberStep()
-                                } else {
-                                    // Invalid input, not a number
-                                    isInvalidInput = true
-                                    handleEnterNumberStep() // Prompt again for a valid number
-                                }
-
-                                bot.removeReplyListener(replyListenerId)
-                                replyListenerId = null
-                            }
-                        )
-                    })
+            if (!messageSent && !conversationState[userId]) {
+                conversationState[userId] = {
+                    currentStep: 'EnterNumber'
                 }
 
-                // Function to handle the "Enter Phone Number" step
-                const handleEnterPhoneNumberStep = () => {
-                    bot.sendMessage(chatId, 'Raqamingizni namunadagidek yuboring: 998339908007', {
-                        reply_markup: {
-                            force_reply: true,
-                            selective: true
-                        }
-                    }).then((payload: any) => {
-                        replyListenerId = bot.onReplyToMessage(
-                            payload.chat.id,
-                            payload.message_id,
-                            async (msg: any) => {
-                                bot.removeReplyListener(replyListenerId)
-                                replyListenerId = null
+                const currentState = conversationState[userId]
 
-                                if (!isNaN(msg.text)) {
-                                    const phone_number = parseFloat(msg.text)
+                await bot.sendMessage(msg.chat.id, 'Nechta buyurtirishni istaysiz:', {
+                    reply_markup: {
+                        keyboard: [
+                            [
+                                {
+                                    text: '⬅️ Orqaga ➡️'
+                                }
+                            ]
+                        ],
+                        resize_keyboard: true
+                    }
+                })
+
+                bot.on('text', async (responseMsg: any) => {
+                    if (responseMsg.from.id === userId) {
+                        const responseText = responseMsg.text
+
+                        switch (currentState.currentStep) {
+                            case 'EnterNumber':
+                                if (!isNaN(responseText)) {
+                                    currentState.number = responseText
+                                    currentState.currentStep = 'EnterPhoneNumber'
+
+                                    await bot.sendMessage(
+                                        msg.chat.id,
+                                        'Raqamingizni namunadagidek yuboring: 339908007',
+                                        {
+                                            reply_markup: {
+                                                keyboard: [
+                                                    [
+                                                        {
+                                                            text: '⬅️ Orqaga ➡️'
+                                                        }
+                                                    ]
+                                                ],
+                                                resize_keyboard: true,
+                                                one_time_keyboard: true
+                                            }
+                                        }
+                                    )
+                                } else {
+                                    await bot.sendMessage(msg.chat.id, 'Iltimos, raqam kiriting.')
+
+                                }
+                                break
+
+                            case 'EnterPhoneNumber':
+                                if (!isNaN(responseText)) {
+                                    const phone_number = parseFloat(responseText)
 
                                     let user = await User.find({
                                         phone_number: phone_number
@@ -243,51 +258,50 @@ bot.on('callback_query', async (query: any) => {
                                         let order = await Orders.create({
                                             user_id: userNew._id,
                                             food_id: foodData._id,
-                                            number: number
+                                            number: currentState.number
                                         })
                                     } else {
                                         let order = await Orders.create({
                                             user_id: user[0]._id,
                                             food_id: foodData._id,
-                                            number: number
+                                            number: currentState.number
                                         })
                                     }
 
-                                    bot.sendMessage(
-                                        chatId,
+                                    currentState.currentStep = 'Complete'
+
+                                    await bot.sendMessage(
+                                        msg.chat.id,
                                         'Sizning buyurtmangiz qabul qilindi, yaqin orada aloqaga chiqamiz 😊😊😊 !!',
                                         {
                                             reply_markup: {
                                                 keyboard: [
-                                                    [
-                                                        {
-                                                            text: '⬅️ Shirinliklar ➡️'
-                                                        }
-                                                    ],
-                                                    [
-                                                        {
-                                                            text: '⬅️ Orqaga ➡️'
-                                                        }
-                                                    ]
+                                                    [{ text: '⬅️ Shirinliklar ➡️' }],
+                                                    [{ text: '⬅️ Orqaga ➡️' }]
                                                 ],
                                                 resize_keyboard: true
                                             }
                                         }
                                     )
 
-                                    bot.removeReplyListener(replyListenerId)
-                                    replyListenerId = null
                                 } else {
-                                    // Invalid input for the phone number, prompt again
-                                    handleEnterPhoneNumberStep()
+                                    await bot.sendMessage(
+                                        msg.chat.id,
+                                        'Iltimos, raqamingizni namunadagidek yuboring: 339908007.'
+                                    )
                                 }
-                            }
-                        )
-                    })
-                }
+                                break
 
-                // Start with the "Enter Number" step
-                handleEnterNumberStep()
+                            default:
+                                // End the conversation
+                                delete conversationState[userId]
+                                bot.removeListener('text', this)
+                                bot.removeAllListeners('text');
+                                break
+                        }
+
+                    }
+                })
 
                 messageSent = true
             }

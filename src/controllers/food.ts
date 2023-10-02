@@ -10,6 +10,7 @@ import { unlink } from 'fs/promises'
 import { message } from '../locales/get_message'
 import Food from '../models/Food'
 
+
 export class FoodController {
     getAll = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
         const { lang } = res.locals

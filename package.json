@@ -7,7 +7,7 @@
         "dev": "nodemon --config nodemon.json src/index.ts",
         "start": "ts-node ./src/index.ts",
         "test": "jest --coverage",
-        "build":"npx tsc"
+        "build": "npx tsc"
     },
     "keywords": [],
     "author": "Bekmirza Yoqubov",
@@ -33,6 +33,7 @@
         "node-telegram-bot-api": "^0.61.0",
         "npmlog": "^4.1.2",
         "sharp": "^0.30.1",
+        "telegraf": "^4.14.0",
         "uuid": "^8.3.2",
         "winston": "^3.3.3"
     },
