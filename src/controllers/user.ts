@@ -10,6 +10,7 @@ import { unlink } from 'fs/promises'
 import { message } from '../locales/get_message'
 import { signToken } from '../middleware/auth'
 import User from '../models/User'
+import Order from '../models/Orders'
 
 export class UserController {
     getAll = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
@@ -85,6 +86,17 @@ export class UserController {
 
     delete = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
         const user = await User.findById(req.params.id)
+
+        if (user) {
+            const findOrder = await Order.find({user_id:user.id})
+
+            if (findOrder) {
+                findOrder.map(async (findorder)=>{
+                    console.log(findorder);
+                    await storage.order.delete(findorder.id)
+                })
+            }
+        }    
 
         await storage.user.delete(req.params.id)
         

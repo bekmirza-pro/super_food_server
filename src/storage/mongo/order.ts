@@ -62,6 +62,7 @@ export class OrderStorage implements OrderRepo {
         }
     }
 
+
     async delete(id: string): Promise<any> {
         try {
             let order = await Order.findByIdAndDelete(id)

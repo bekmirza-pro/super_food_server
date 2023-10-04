@@ -116,7 +116,7 @@ bot.on('message', async (msg: any) => {
             // If yes, delete the conversation state
             delete conversationState[userId]
         }
-
+        
         bot.removeAllListeners('text');
 
         bot.sendMessage(receiver, '✅ Asosiy menyuga qaytdingiz !!!', {
